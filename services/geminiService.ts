@@ -20,14 +20,18 @@ export const analyzeSchedule = async (
     
     const prompt = `
       Ben bir sağlık çalışanıyım/nöbet usulü çalışan biriyim. İşte ${month} ayı için çalışma programım.
-      Nöbet tuttuğum günler şunlar: ${sortedShifts.join(', ')}.
+      
+      ${shifts.length > 0 
+        ? `Nöbet tuttuğum günler şunlar: ${sortedShifts.join(', ')}.` 
+        : `Bu ay için henüz hiç nöbetim yazılmadı veya planlamadım (Liste boş).`
+      }
       
       Lütfen nöbet programımın Türkçe olarak kısa, samimi ve faydalı bir analizini yap:
-      1. Toplam nöbet sayısını belirt.
-      2. Peş peşe (blok) nöbetler veya hafta sonu nöbetleri olup olmadığını kontrol et.
-      3. Bu iş yüküne göre bana kısa bir motivasyon cümlesi veya sağlık/dinlenme tavsiyesi ver.
+      1. Toplam nöbet sayısını belirt. (Eğer 0 ise bunu vurgula).
+      2. Programın yoğunluğunu değerlendir. (Eğer boşsa dinlenme fırsatından bahset).
+      3. Bu duruma göre bana kısa bir motivasyon cümlesi veya sağlık/dinlenme tavsiyesi ver.
       
-      Tonu pozitif ve destekleyici tut.
+      Tonu pozitif, samimi ve destekleyici tut.
     `;
 
     const response = await ai.models.generateContent({

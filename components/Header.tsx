@@ -70,12 +70,12 @@ const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={onAnalyze}
-            disabled={!hasShifts || analysisStatus === AnalysisStatus.LOADING}
+            disabled={analysisStatus === AnalysisStatus.LOADING}
             className={`
               flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all
-              ${!hasShifts 
-                ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed' 
-                : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-lg active:scale-95 dark:bg-indigo-600 dark:hover:bg-indigo-500'}
+              bg-indigo-600 hover:bg-indigo-700 text-white shadow-md hover:shadow-lg active:scale-95 
+              dark:bg-indigo-600 dark:hover:bg-indigo-500
+              disabled:opacity-70 disabled:cursor-wait disabled:active:scale-100
             `}
           >
             {analysisStatus === AnalysisStatus.LOADING ? (

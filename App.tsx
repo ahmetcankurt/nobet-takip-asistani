@@ -170,13 +170,7 @@ const App: React.FC = () => {
     const currentMonthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
     const monthlyShifts = (Array.from(currentShiftsSet) as string[]).filter(s => s.startsWith(currentMonthPrefix));
 
-    if (monthlyShifts.length === 0) {
-        setAnalysisResult("Bu ay için henüz hiç nöbet seçmediniz.");
-        setAnalysisStatus(AnalysisStatus.SUCCESS);
-        setIsModalOpen(true);
-        return;
-    }
-
+    // Even if monthlyShifts is empty, we send it to AI for a "Rest Month" comment
     const result = await analyzeSchedule(monthName, monthlyShifts);
     setAnalysisResult(result);
     setAnalysisStatus(AnalysisStatus.SUCCESS);
@@ -235,10 +229,10 @@ const App: React.FC = () => {
   }, [currentShiftsSet, year, month]);
 
   return (
-    <div className="h-screen w-full bg-slate-50 dark:bg-slate-950 flex flex-col overflow-hidden font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300 relative">
+    <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950 flex flex-col font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300">
       
       {/* FIXED TOP HEADER */}
-      <div className="flex-none z-20">
+      <div className="fixed top-0 left-0 right-0 z-40">
         <Header 
           currentDate={currentDate} 
           onPrevMonth={handlePrevMonth} 
@@ -251,11 +245,12 @@ const App: React.FC = () => {
         />
       </div>
 
-      {/* MAIN CONTENT - SCROLLABLE IF NEEDED BUT FITS SCREEN */}
-      <main className="flex-1 flex flex-col w-full max-w-5xl mx-auto px-2 sm:px-4 py-2 min-h-0 relative">
+      {/* MAIN CONTENT */}
+      {/* Added pt-20 (header height) and pb-24 (footer height) to prevent overlap */}
+      <main className="flex-1 w-full max-w-5xl mx-auto px-2 sm:px-4 py-2 relative pt-20 sm:pt-24 pb-24 sm:pb-24">
         
         {/* Weekday Headers */}
-        <div className="flex-none grid grid-cols-7 mb-2">
+        <div className="grid grid-cols-7 mb-2 sticky top-20 z-10 bg-slate-50 dark:bg-slate-950 py-2">
           {weekDays.map(day => (
             <div key={day} className="text-center py-1 text-xs sm:text-sm font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
               {day}
@@ -263,8 +258,8 @@ const App: React.FC = () => {
           ))}
         </div>
 
-        {/* Responsive Calendar Grid - Fills remaining space */}
-        <div className="flex-1 grid grid-cols-7 grid-rows-6 gap-1 sm:gap-2 pb-2">
+        {/* Calendar Grid */}
+        <div className="grid grid-cols-7 grid-rows-6 gap-1 sm:gap-2 h-[calc(100vh-220px)] sm:h-auto min-h-[350px]">
           {renderCalendarGrid()}
         </div>
 
@@ -272,7 +267,7 @@ const App: React.FC = () => {
       
       {/* TOAST NOTIFICATION */}
       {showToast && (
-        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
           <div className="bg-emerald-600 dark:bg-emerald-500 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm font-medium">
             <CheckCircle2 className="w-4 h-4" />
             <span>Değişiklikler başarıyla kaydedildi</span>
@@ -281,7 +276,7 @@ const App: React.FC = () => {
       )}
 
       {/* FIXED BOTTOM FOOTER / CONTROLS */}
-      <div className="flex-none bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-3 sm:p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20 transition-colors duration-300">
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-3 sm:p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-colors duration-300">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
             
             {/* Stats */}
@@ -331,8 +326,8 @@ const App: React.FC = () => {
                     }
                   `}
                 >
-                  {!hasUnsavedChanges ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
-                  <span>{!hasUnsavedChanges ? 'Kaydedildi' : 'Kaydet'}</span>
+                  <Save className="w-4 h-4" />
+                  <span>Kaydet</span>
                 </button>
             </div>
         </div>
