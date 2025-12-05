@@ -2,8 +2,8 @@ import { GoogleGenAI } from "@google/genai";
 
 const getAIClient = () => {
   if (!process.env.API_KEY) {
-    console.error("API_KEY is missing from environment variables.");
-    throw new Error("API Key not found");
+    console.error("API_KEY eksik.");
+    throw new Error("API Key bulunamadı.");
   }
   return new GoogleGenAI({ apiKey: process.env.API_KEY });
 };
@@ -14,24 +14,21 @@ export const analyzeSchedule = async (
 ): Promise<string> => {
   try {
     const ai = getAIClient();
-    
-    // Sort shifts for better context
-    const sortedShifts = [...shifts].sort();
-    
+
     const prompt = `
-      Ben bir sağlık çalışanıyım/nöbet usulü çalışan biriyim. İşte ${month} ayı için çalışma programım.
-      
+      Ben bir nöbet usulü çalışanım ve ${month} ayı için nöbet programım şu şekilde:
+
       ${shifts.length > 0 
-        ? `Nöbet tuttuğum günler şunlar: ${sortedShifts.join(', ')}.` 
-        : `Bu ay için henüz hiç nöbetim yazılmadı veya planlamadım (Liste boş).`
+        ? `Nöbet günlerim: ${shifts.join(', ')}.` 
+        : `Bu ay için henüz nöbetim yok.`
       }
-      
-      Lütfen nöbet programımın Türkçe olarak kısa, samimi ve faydalı bir analizini yap:
-      1. Toplam nöbet sayısını belirt. (Eğer 0 ise bunu vurgula).
-      2. Programın yoğunluğunu değerlendir. (Eğer boşsa dinlenme fırsatından bahset).
-      3. Bu duruma göre bana kısa bir motivasyon cümlesi veya sağlık/dinlenme tavsiyesi ver.
-      
-      Tonu pozitif, samimi ve destekleyici tut.
+
+      Lütfen programımın kısa, samimi ve faydalı bir analizini yap:
+      1. Toplam nöbet sayısını belirt (0 ise bunu vurgula).
+      2. Programın yoğunluğunu değerlendir (boşsa dinlenme fırsatından bahset).
+      3. Kısa bir motivasyon cümlesi veya tavsiye ver.
+
+      Tonu pozitif, samimi ve destekleyici olsun.
     `;
 
     const response = await ai.models.generateContent({
@@ -41,7 +38,7 @@ export const analyzeSchedule = async (
 
     return response.text || "Analiz oluşturulamadı.";
   } catch (error) {
-    console.error("Error analyzing schedule:", error);
-    return "Üzgünüm, şu anda programını analiz edemiyorum. Lütfen API anahtarını kontrol et.";
+    console.error("Program analizi hatası:", error);
+    return "Şu anda programını analiz edemiyorum. API anahtarını kontrol et.";
   }
 };
